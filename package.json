@@ -1,0 +1,50 @@
+{
+  "name": "opencode-magpie-quota",
+  "version": "0.1.0",
+  "description": "Live Magpie quota in the OpenCode TUI, following the selected model",
+  "type": "module",
+  "license": "MIT",
+  "author": "zxunify",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zxunify/opencode-magpie-quota.git"
+  },
+  "homepage": "https://github.com/zxunify/opencode-magpie-quota#readme",
+  "bugs": {
+    "url": "https://github.com/zxunify/opencode-magpie-quota/issues"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "magpie",
+    "quota",
+    "tui"
+  ],
+  "files": [
+    "tui.js",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "exports": {
+    "./tui": "./tui.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "@opencode/plugin": ">=2.0.32 <3",
+    "@opentui/core": ">=0.5.17 <0.7",
+    "@opentui/solid": ">=0.5.17 <0.7",
+    "solid-js": ">=1.9.0"
+  },
+  "peerDependenciesMeta": {
+    "@opencode/plugin": { "optional": true },
+    "@opentui/core": { "optional": true },
+    "@opentui/solid": { "optional": true },
+    "solid-js": { "optional": true }
+  }
+}
