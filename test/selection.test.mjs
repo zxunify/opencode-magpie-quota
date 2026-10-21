@@ -26,6 +26,18 @@ test("selection follows catalog provider, never the globally last-used account",
   assert.equal(status("unknown/model").text, "Magpie unknown · no quota")
 })
 
+test("footer keeps separate quota windows", () => {
+  const cards = [{
+    provider: "codex",
+    name: "Codex",
+    windows: [
+      { name: "5 hours", remaining: 91 },
+      { name: "7 days", remaining: 99 },
+    ],
+  }]
+  assert.equal(status("codex/gpt", { accounts: cards }).text, "Magpie Codex · 5h 91% · 7d 99%")
+})
+
 test("groups wait for their own session route; stale routes for another selection are ignored", () => {
   assert.equal(status("group/auto").text, "Magpie · awaiting route")
   assert.equal(status("group/auto", { route: { asked: "group/auto", model: "acme-plugin/large" } }).text, "Magpie Acme 80%")

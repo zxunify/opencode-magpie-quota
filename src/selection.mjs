@@ -44,6 +44,33 @@ export function remainingOf(window) {
   return value === undefined ? undefined : Math.max(0, Math.min(100, value))
 }
 
+function windowLabel(window) {
+  const name = String(window?.name || "quota").trim()
+  return name
+    .replace(/^(\d+)\s*hours?$/i, "$1h")
+    .replace(/^(\d+)\s*days?$/i, "$1d")
+}
+
+function windowFigure(window) {
+  const remaining = remainingOf(window)
+  if (remaining !== undefined) return { remaining }
+  if (window.unlimited) return { text: "∞" }
+  if (window.display) return { text: window.display }
+  return { text: "no quota" }
+}
+
+function formatFigures(figures) {
+  const measured = figures.map((figure) => figure.remaining).filter((value) => value !== undefined)
+  if (measured.length === figures.length) {
+    const low = Math.round(Math.min(...measured)), high = Math.round(Math.max(...measured))
+    return { text: low === high ? `${low}%` : `${low}–${high}%`, measured }
+  }
+  return {
+    text: [...new Set(figures.map((figure) => figure.remaining === undefined ? figure.text : `${Math.round(figure.remaining)}%`))].join(" / "),
+    measured,
+  }
+}
+
 export function selectedStatus({ modelID, models = [], accounts = [], route, phase, error }) {
   if (!modelID) return { text: "" }
   const target = resolveTarget(modelID, models, accounts, route)
@@ -57,25 +84,37 @@ export function selectedStatus({ modelID, models = [], accounts = [], route, pha
   }
   const healthy = matching.filter((account) => !account.error)
   if (!healthy.length) return { text: `${prefix} · unavailable`, error: true }
-  const figures = healthy.map((account) => {
+  const grouped = new Map()
+  for (const account of healthy) {
     const windows = (account.windows || []).filter((window) => matchesWindow(window, target.localID))
-    const values = windows.map(remainingOf).filter((value) => value !== undefined)
-    if (values.length) return { remaining: Math.min(...values) }
-    if (windows.some((window) => window.unlimited)) return { text: "∞" }
-    if (account.balance !== undefined && account.balance !== "") return { text: String(account.balance) }
-    const display = windows.find((window) => window.display)?.display
-    return { text: display || "no quota" }
-  })
-  const measured = figures.map((figure) => figure.remaining).filter((value) => value !== undefined)
+    for (const window of windows) {
+      const label = windowLabel(window)
+      const figures = grouped.get(label) || []
+      figures.push(windowFigure(window))
+      grouped.set(label, figures)
+    }
+  }
+  let measured = []
   let value
-  if (measured.length === figures.length) {
-    const low = Math.round(Math.min(...measured)), high = Math.round(Math.max(...measured))
-    value = low === high ? `${low}%` : `${low}–${high}%`
+  if (grouped.size) {
+    const entries = [...grouped].map(([label, figures]) => {
+      const formatted = formatFigures(figures)
+      measured = measured.concat(formatted.measured)
+      return grouped.size > 1 ? `${label} ${formatted.text}` : formatted.text
+    })
+    value = entries.join(" · ")
   } else {
-    value = [...new Set(figures.map((figure) => figure.remaining === undefined ? figure.text : `${Math.round(figure.remaining)}%`))].join(" / ")
+    const figures = healthy.map((account) => {
+      if (account.balance !== undefined && account.balance !== "") return { text: String(account.balance) }
+      return { text: "no quota" }
+    })
+    const formatted = formatFigures(figures)
+    measured = formatted.measured
+    value = formatted.text
   }
   const count = healthy.length > 1 ? ` · ${healthy.length} accts` : ""
   const failed = matching.length - healthy.length
   const warning = phase === "stale" || failed > 0 ? " !" : ""
-  return { text: `${prefix} ${value}${count}${warning}`, remaining: measured.length ? Math.min(...measured) : undefined }
+  const separator = grouped.size > 1 ? " · " : " "
+  return { text: `${prefix}${separator}${value}${count}${warning}`, remaining: measured.length ? Math.min(...measured) : undefined }
 }

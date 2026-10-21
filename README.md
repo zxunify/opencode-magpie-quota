@@ -8,6 +8,7 @@ OpenCode TUI plugin that shows live [Magpie](https://usemagpie.ai/) quota in the
 
 - 模型目录来自 Magpie 的 `GET /v1/models`，按 `owned_by` 匹配额度的 `provider`，不内置供应商名单，支持订阅、余额、插件供应商和远程供应商。
 - 百分比表示剩余比例；余额保留厂商给出的币种和文字；无限额度显示 `∞`。
+- 底部摘要会分别显示不同额度窗口，例如 `5h 91% · 7d 99%`；`/quota` 面板保留完整窗口名称和重置时间。
 - 同一供应商多个正常账号显示剩余范围和账号数，不累加百分比，也不把最近使用的账号称作当前账号。`!` 表示读取失败后保留旧数据，或该供应商有账号报错。
 - 路由组及故障转移按当前会话 `GET /v1/magpie/route?session=...` 的实际模型显示。只采用 `asked` 与当前选择相同的主会话路由；尚无路由时显示 `awaiting route`。切换模型后不会沿用其他模型的路由。
 - 非 Magpie 供应商隐藏底部额度。名为 `magpie` 的 OpenCode 供应商，以及 baseURL 与本插件网关地址相同的供应商，视为 Magpie 连接。
