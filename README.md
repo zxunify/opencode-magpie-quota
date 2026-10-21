@@ -2,7 +2,7 @@
 
 OpenCode TUI plugin that shows live [Magpie](https://usemagpie.ai/) quota in the prompt footer and follows the model currently selected in OpenCode.
 
-底部额度跟随 OpenCode 当前选择的模型；每 10 秒读取 Magpie 缓存。
+底部额度跟随 OpenCode 当前选择的模型；每 10 秒读取 Magpie 缓存。当前版本为 `0.1.1`。
 
 ## 功能
 

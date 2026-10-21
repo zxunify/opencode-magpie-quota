@@ -1,6 +1,6 @@
 {
   "name": "opencode-magpie-quota",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Live Magpie quota in the OpenCode TUI, following the selected model",
   "type": "module",
   "license": "MIT",
